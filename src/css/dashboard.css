@@ -1,0 +1,24 @@
+.left_panel{
+    position: fixed;
+    top:0;
+    height: 100vh;
+    width: 20%;
+    background-color: #375a7f;
+}
+.left_panel *{
+    color:cadetblue;
+}
+.left_panel>h2{
+    margin-top:70px;
+    padding:8px;
+    border-top:1px solid slategray;
+    border-bottom:1px solid slategrey;
+}
+#title{
+    margin-top: 100px;
+}
+.right_panel{
+    margin-top:70px;
+    width: 80%;
+    float:right;
+}
