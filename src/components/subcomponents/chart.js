@@ -7,11 +7,14 @@ class BugChart extends Component {
   constructor(props){
     super(props);
     this.props.loadChart();
+    this.state = {
+        selectedOption:'pie',
+    }
   }
 
   componentDidUpdate(){
     var myChart = new Chart(this.ctx, {
-        type: 'pie',
+        type: this.state.selectedOption,
         data: {
             labels: ["Duplicate Bugs", "Unique Bugs"],
             datasets: [{
@@ -40,9 +43,20 @@ class BugChart extends Component {
     });
   }
   render() {
-      console.log(this.props.data);
     return (
         <div>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <div className="radio">
+                <label class={(this.state.selectedOption=='pie')?'btn btn-primary btn-lg active':'btn btn-primary btn-lg'}>
+                    <input style={{position: 'absolute',clip: 'rect(0, 0, 0, 0)'}} type="checkbox" value="pie" checked={this.state.selectedOption === 'pie'} onChange={()=>this.setState({selectedOption:'pie'})} /> Pie
+                </label>
+            </div>
+            <div className="radio">
+                <label class={(this.state.selectedOption=='doughnut')?'btn btn-primary btn-lg active':'btn btn-primary btn-lg'}>
+                    <input style={{position: 'absolute',clip: 'rect(0, 0, 0, 0)'}} type="radio" value="doughnut" checked={this.state.selectedOption === 'doughnut'} onChange={()=>this.setState({selectedOption:'doughnut'})}/> Doughnut
+                </label>
+            </div>
+            </div>
             <h1 className = "text-center">Stats for Bug Duplication </h1>
         <canvas id="bugChart" width="100" height="100" ref = {(elem)=>{this.ctx = elem}}></canvas>
         </div>

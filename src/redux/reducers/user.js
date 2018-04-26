@@ -1,19 +1,22 @@
 var initialUser={
     user:{
         id:'',
-        name:'',
-        type:'',
+        name:'Dummy',
+        user:'Dummy',
+        type:'Dummy',
         auth:false,
     }
 };
 export default function(state = initialUser,action){
     switch (action.type){
         case "LOGIN_SUCCESS":
+        console.log(action.data);
             return state = {
                 ...state,
                 user:{
                     id:action.data.id,
-                    name:action.data.user,
+                    user:action.data.user,
+                    name:action.data.name,
                     type:action.data.type,
                     auth:action.data.auth
                 }

@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {Route,Switch} from 'react-router-dom'
+import {Route,Switch,Link} from 'react-router-dom'
 import '../css/dashboard.css'
 import Navbar from  './subcomponents/navbar.js';
 import Bugs from './subcomponents/bugs.js'
 import BugChart from './subcomponents/chart.js'
 import TestCase from './subcomponents/test.js'
 import Collapsable from './collapsable.js'
+import OverView from './subcomponents/overview.js'
 
-var Project=[{name:'Project 1',mod:['Mod 1','Mod 2']},{name:'Project 2',mod:['Mod 3','Mod 4']},{name:'Project 3',mod:['Mod 1','Mod 2']}];
+var Project=[
+    {name:'Project',mod:[{title:'Report a Bug',link:'/user/bugs'},{title:'Open Test Cases',link:'/user/test-cases'}]},
+];
 
 class Dashboard extends Component {
   constructor(props){
@@ -27,7 +30,7 @@ class Dashboard extends Component {
                         <ul className="list-group" >
                             {value.mod.map(function(item,i){
                                 return (
-                                    <li style={{cursor:'pointer'}} key={i} className="pl-4 ml-2 list-group-item d-flex justify-content-between align-items-right " >{item}</li>
+                                    <li style={{cursor:'pointer'}} key={i} className="pl-4 ml-2 list-group-item d-flex justify-content-between align-items-right " ><Link to={item.link}>{item.title}</Link></li>
                                 );
                             })}
                         </ul>
@@ -38,7 +41,7 @@ class Dashboard extends Component {
 
             <div className="right_panel">
                 <Switch>
-                    <Route exact path="/user" component={()=>{return <h1>Welcome</h1>}}/>
+                    <Route exact path="/user" component={OverView}/>
                     <Route exact path="/user/bugs" component={Bugs}/>
                     <Route exact path="/user/bugs/chart" component={BugChart}/>
                     <Route exact path="/user/test-cases" component={TestCase}/>
