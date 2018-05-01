@@ -30,3 +30,20 @@ export function login(user){
         })
     }
 }
+export function register(user){
+    return dispatch=>{
+        axios({
+            method:'POST',
+            url:Base_Url+'/user/register',
+            data:user,
+        }).then(function(response){
+            console.log(response);
+            dispatch({
+                type:'LOGIN_SUCCESS',
+                data:response.data
+            })
+        }).catch(function(response){
+            console.log(response);
+        })
+    }
+}

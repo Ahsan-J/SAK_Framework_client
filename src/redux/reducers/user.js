@@ -1,9 +1,9 @@
 var initialUser={
     user:{
-        id:'',
+        id:'Hyna0pHpz',
         name:'Dummy',
         user:'Dummy',
-        type:'Dummy',
+        role:'Dummy',
         auth:false,
     }
 };
@@ -17,7 +17,7 @@ export default function(state = initialUser,action){
                     id:action.data.id,
                     user:action.data.user,
                     name:action.data.name,
-                    type:action.data.type,
+                    role:action.data.role,
                     auth:action.data.auth
                 }
             };

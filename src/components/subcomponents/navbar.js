@@ -8,28 +8,8 @@ var menu = [
     //     title:'Home',
     //     link_to:'/user',
     // },
-    // {
-    //     title:'Bug',
-    //     link_to:'/user/bugs',
-    // },
-    // {
-    //     title:'Test Case',
-    //     link_to:'/user/test-cases',
-    // },
-    // {
-    //     title:'Log out',
-    //     link_to:'/',
-    // },
-    // {
-    //     title:'chart',
-    //     link_to:'/user/bugs/chart',
-    // }
 ]
 class Navbar extends Component {
-  constructor(props){
-    super(props);
-  }
-  
   render() {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary" style={styles.navBarContainer}>
