@@ -2,28 +2,61 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import ShortID from 'shortid'
 import _ from 'lodash'
-// import {} from '../../redux/axios/module.js'
+import {addModule, getModule, updateModule} from '../../redux/axios/module.js'
+import {clearModule} from '../../redux/actions/module.js'
+import moment from 'moment'
 
-class Bugs extends Component {
+class Module extends Component {
   constructor(props){
     super(props);
     this.state={
         id:null,
         name:null,
-        descriprion:null,
+        description:null,
+        mode:'',
     }
+    this.onEditModal = this.onEditModal.bind(this);
+    this.updateModule = this.updateModule.bind(this);
     this.addModule = this.addModule.bind(this);
     this.onOpenModal = this.onOpenModal.bind(this);
   }
   addModule(){
-
+    this.props.addModule({
+        id:this.state.id,
+        name:this.state.name,
+        description:this.state.description,
+        app_id:this.props.match.params.app_id,
+        created_by:this.props.user.id,
+    })
+  }
+  updateModule(){
+      this.props.updateModule({
+          id:this.state.id,
+          name:this.state.name,
+          description:this.state.description,
+      })
+  }
+  onEditModal(Module){
+    this.setState({
+        id:Module.id,
+        name:Module.name,
+        description:Module.description,
+        mode:'update',
+    })
   }
   onOpenModal(){
     this.setState({
         id:ShortID.generate(),
         name:null,
-        descriprion:null,
+        description:null,
+        mode:'add',
     });
+  }
+  componentWillMount(){
+    this.props.getModules({app_id:this.props.match.params.app_id});
+  }
+  componentWillUnmount(){
+    this.props.clearModules();
   }
   render() {
     return (
@@ -44,17 +77,36 @@ class Bugs extends Component {
                         <th scope="col">Created at</th>
                         <th scope="col">Project Id</th>
                         <th scope="col">Parent Module</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    {this.props.modules.map(function(value,index){
+                        return (
+                            <tr key={value.id + index}>
+
+                                <td>{value.id}</td>
+                                <td>{value.name}</td>
+                                <td>{value.description}</td>
+                                <td>{value.created_at}</td>
+                                <td>{value.app_id}</td>
+                                <td>{value.parent_module_id}</td>
+                                <td>
+                                    <div className="btn-group-horizontal" >
+                                        <button className="btn btn-primary" data-toggle="modal" data-target="#add_module" onClick={()=>this.onEditModal(value)}><i className="fa fa-pencil" aria-hidden="true"></i></button>
+                                        <button className="btn btn-danger"><i className="fa fa-trash" aria-hidden="true"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        )
+                    },this)}
                 </tbody>
             </table>
             <div className="modal fade" id="add_module" tabIndex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="ModalLabel">Add a Project Module</h5>
+                        <h5 className="modal-title" id="ModalLabel">{(this.state.mode==='add')?"Add a Project Module":"Updating a Project Module"}</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -79,17 +131,17 @@ class Bugs extends Component {
                             </div>
                             <div className="form-group">
                                 <label>Module Name</label>
-                                <input type="text" className="form-control" aria-describedby="emailHelp" placeholder="Module Name" onChange={(e)=>{this.setState({name:e.target.value})}} />
+                                <input type="text" className="form-control" aria-describedby="emailHelp" placeholder="Module Name" value={(this.state.name===null)?'':this.state.name} onChange={(e)=>{this.setState({name:e.target.value})}} />
                             </div>
                             <div className="form-group">
                                 <label>Module Description</label>
-                                <textarea className="form-control" rows="3" placeholder="Description about the New Module" onChange={(e)=>{console.log(e.target.value)}}></textarea>
+                                <textarea className="form-control" rows="3" placeholder="Description about the New Module" value={(this.state.description===null)?'':this.state.description} onChange={(e)=>{this.setState({description:e.target.value})}}></textarea>
                             </div>
                         </form>
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.addModule} > Create Project Module </button>
+                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={(this.state.mode==='add')?this.addModule:this.updateModule} > {(this.state.mode==='add')?"Create Project Module":"Update Project Module"} </button>
                     </div>
                     </div>
                 </div>
@@ -102,13 +154,17 @@ class Bugs extends Component {
 const mapStateToProps = (state)=>{
     return {
         user:state.user.user,
+        modules : state.module.modules,
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-
+        addModule:(modules)=>{dispatch(addModule(modules))},
+        updateModule:(modules)=>{dispatch(updateModule(modules))},
+        getModules : (param_data)=>{dispatch(getModule(param_data))},
+        clearModules : ()=>{dispatch(clearModule())},
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Bugs);
+export default connect(mapStateToProps,mapDispatchToProps)(Module);

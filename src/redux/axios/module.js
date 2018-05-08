@@ -1,13 +1,13 @@
 import axios from 'axios';
 import {Base_Url} from '../../config.js'
-import {addBug as add,getBug as get,setChart} from '../actions/bugs.js'
+import {addModule as add,getModule as get,updateModule as update} from '../actions/module.js'
 
-export function addBug (bug){
+export function addModule (modules){
     return dispatch=>{        
         axios({
             method:'POST',
-            url:Base_Url+'/bugs/add',
-            data:bug,
+            url:Base_Url+'/module/add',
+            data:modules,
         }).then(function(response){
             dispatch(add(response.data))
         }).catch(function(response){
@@ -15,12 +15,11 @@ export function addBug (bug){
         })
     }
 }
-
-export function getBug(param_data){
+export function getModule(param_data){
     return dispatch=>{
         axios({
             method:'GET',
-            url:Base_Url+'/control/bug',
+            url:Base_Url+'/app/module',
             params:param_data,
         }).then(function(response){
             dispatch(get(response.data))
@@ -29,17 +28,16 @@ export function getBug(param_data){
         })
     }
 }
-
-export function getChartData(){
+export function updateModule(param_data){
     return dispatch=>{
         axios({
-            method:'GET',
-            url:Base_Url+'/bug/chart_data'
+            method:'PUT',
+            url:Base_Url+'/module/update',
+            data:param_data,
         }).then(function(response){
-            dispatch(setChart(response.data))
-            console.log(response);
+            dispatch(update(response.data))
         }).catch(function(response){
-
+            console.log(response);
         })
     }
 }

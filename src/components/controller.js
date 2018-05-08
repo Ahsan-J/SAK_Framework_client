@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {Route,Switch,Link} from 'react-router-dom'
+import {Route,Switch,Link,Redirect} from 'react-router-dom'
 import '../css/controller.css'
 import Navbar from  './subcomponents/navbar.js';
 import Bugs from './subcomponents/bugs.js'
 import TestCase from './subcomponents/test.js'
-import {addApp} from '../redux/axios/application.js'
+import Screen from './subcomponents/screens.js'
+import {addApp,getApps} from '../redux/axios/application.js'
 import OverView from './subcomponents/overview.js'
 import Module from './subcomponents/module.js'
 import avatarImg from '../assets/img_avatar.png'
@@ -16,27 +17,22 @@ class Controller extends Component {
   constructor(props){
     super(props);
     this.state={
-        projects:[],
-        newProject:{
-            name:'',
-        }
+        name:'',
     }
+    this.props.getApps();
     this.addApplication = this.addApplication.bind(this);
   }
   addApplication(){
-      this.props.addApplication({...this.state.newProject,created_by:this.props.user.id});
-      this.setState({newProject:{...this.state.newProject,name:''}})
+    this.props.addApplication({
+        name:this.state.name,
+        created_by:this.props.user.id,
+    });
+    this.setState({
+        name:''
+    })
   }
   componentWillMount(){
-    var comp = this;
-    axios({
-        method:'GET',
-        url:Base_Url+'/app',
-    }).then(function(response){
-        comp.setState({projects:response.data});
-    }).catch(function(response){
-        console.log('/app in controller' , response);
-    })
+    
   }
 
   render() {
@@ -45,7 +41,7 @@ class Controller extends Component {
             <Navbar/>
             <div className="left_panel">
                 <h2>Projects <span style={{cursor:'pointer'}} className="float-right" data-toggle="modal" data-target="#add_project"><i className="fa fa-plus" aria-hidden="true"></i></span></h2>
-                {this.state.projects.map(function(value,index){
+                {this.props.projects.map(function(value,index){
                     return (
                         <div key={index}>
                             <ul className="list-group" >
@@ -63,9 +59,9 @@ class Controller extends Component {
                 <Switch>
                     <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id"} component={OverView}/>
                     <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/module"} component={Module}/>
-                    <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/screen"} component={Module}/>
+                    <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/screen"} component={Screen}/>
                     <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/controls"} component={Module}/>
-                    <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/bugs"} component={Module}/>
+                    <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/bugs"} component={Bugs}/>
                     <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/test-cases"} component={Module}/>
                     <Route exact path={"/"+this.props.match.params.user_id+"/app/:app_id/users"} component={Module}/>
                 </Switch>
@@ -84,7 +80,7 @@ class Controller extends Component {
                         <form>
                             <div className="form-group">
                                 <label>Project Name</label>
-                                <input type="text" className="form-control" aria-describedby="emailHelp" placeholder="Project Name" onChange={(e)=>{this.setState({newProject:{...this.props.newProject,name:e.target.value}})}} />
+                                <input type="text" className="form-control" aria-describedby="emailHelp" placeholder="Project Name" onChange={(e)=>{this.setState({name:e.target.value})}} />
                             </div>
                             <div className="form-group row">
                                 <label className="col-sm-3 col-form-label">Created By : </label>
@@ -115,12 +111,14 @@ const mapStateToProps = (state)=>{
     return {
         user:state.user.user,
         testCases:state.test.cases,
+        projects:state.application.projects,
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        addApplication : (newProject)=>dispatch(addApp(newProject))
+        addApplication : (newApp)=>dispatch(addApp(newApp)),
+        getApps : ()=>dispatch(getApps()),
     }
 }
 

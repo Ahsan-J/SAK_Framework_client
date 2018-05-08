@@ -1,86 +1,140 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom'
-import {getAllBugs,insertBug} from '../../redux/axios/bugs.js'
+import ShortID from 'shortid'
+import _ from 'lodash'
+import {addBug,getBug} from '../../redux/axios/bugs.js'
+import {clearBug} from '../../redux/actions/bugs.js'
 
 class Bugs extends Component {
   constructor(props){
     super(props);
-    this.state = {
-        modal:false,
+    this.state={
+        id:null,
+        name:null,
+        description:null,
+        control_id:null,
+        status:null,
     }
-    this.submitBug = this.submitBug.bind(this);
-    this.toggle = this.toggle.bind(this);
-    this.props.getAllBugs();
+    
+    this.addBug = this.addBug.bind(this);
+    this.onOpenModal = this.onOpenModal.bind(this);
   }
-  
-  submitBug(bug){
-    this.props.reportBug(bug);
+  addBug(){
+    this.props.addBugs({
+        id:this.state.id,
+        name:this.state.name,
+        description:this.state.description,
+        control_id:this.state.control_id,
+        status:this.state.status,
+    })
   }
-  
-  toggle(){
-      this.setState({modal:!this.state.modal})
+  onOpenModal(){
+    this.setState({
+        id:ShortID.generate(),
+        name:null,
+        description:null,
+        control_id:null,
+        status:null,
+    });
   }
-
+  componentWillMount(){
+    this.props.getBugs({app_id:this.props.match.params.app_id});
+  }
+  componentWillUnmount(){
+    this.props.clearBugs();
+  }
   render() {
     return (
         <div>
             <div className="float-left m-4">
-                <h2>Project - Bug</h2>
+                <h2>{this.props.match.params.app_id} - Bugs</h2>
             </div>
             <div className="btn-group float-right m-4" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-primary btn-lg" onClick={this.toggle} data-toggle="modal">Report a Bug</button>
-                <Link className="btn btn-success btn-lg" to="/user/bugs/chart" data-toggle="modal">BI</Link>
+                <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#add_bug" onClick={this.onOpenModal} >Report Bug</button>
             </div>
-            <Modal show={this.state.modal} toggle={this.toggle} handleSubmit={this.submitBug} />
-            
+
             <table className="table table-hover">
                 <thead>
                     <tr style={{backgroundColor:'#375a7f'}}>
-                        <th scope="col">Bug id</th>
-                        <th scope="col">Bug Description</th>
-                        <th scope="col">Control Name</th>
-                        <th scope="col">Screen Name</th>
-                        <th scope="col">Reported by</th>
-                        <th scope="col">assignto</th>
-                        <th scope="col">Project Id</th>
+                        <th scope="col">id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Status</th>
-                        <th scope="col">Reported Date</th>
-                        <th scope="col">Actions</th>
+                        <th scope="col">Control Id</th>
+                        <th scope="col">Reported by</th>
+                        <th scope="col">Report Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {this.props.bugs.map(function(item,index){
-                        var duplicateColor={
-                            
-                        }
-                        if(item.duplicate==true){
-                            duplicateColor={
-                                backgroundColor:'#F99C8D',
-                            }
-                        }
-                        return(
-                        <tr key={index} style={duplicateColor}>
-                            <td>{item.bugid}</td>
-                            <td>{item.bugdesc}</td>
-                            <td>{item.controlname}</td>
-                            <td>{item.screenname}</td>
-                            <td>{item.reportedby}</td>
-                            <td>{item.assignto}</td>
-                            <td>{item.appid}</td>
-                            <td>{item.status}</td>
-                            <td>{item.reportdate}</td>
-                            <td>
-                                <div className="btn-group" >
-                                    <button className="btn-success"><i className="fa fa-pencil" aria-hidden="true"></i></button>
-                                    <button className="btn-danger"><i className="fa fa-trash" aria-hidden="true"></i></button>
-                                </div>
-                            </td>
-                        </tr>
+                    {this.props.bugs.map(function(value,index){
+                        return (
+                            <tr key={value.id + index}>
+                                <td>{value.id}</td>
+                                <td>{value.name}</td>
+                                <td>{value.description}</td>
+                                <td>{value.status}</td>
+                                <td>{value.control_id}</td>
+                                <td>{value.reported_by}</td>
+                                <td>{value.report_date}</td>  
+                            </tr>
                         )
                     })}
                 </tbody>
             </table>
+            <div className="modal fade" id="add_bug" tabIndex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="ModalLabel">Reporting a Bug</h5>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <form>
+                            <div className="form-group row">
+                                <div className="col-12 row">
+                                    <div className="col-7 row">
+                                        <label className="col-6 col-form-label">Bug id:</label>
+                                        <div className="col-6">    
+                                            <input type="text" readOnly className="form-control-plaintext" value={(_.isNull(this.state.id))?'':this.state.id}/>
+                                        </div>
+                                    </div>
+                                    <div className="col-6 row">
+                                        <label className="col-6 col-form-label">App id:</label>
+                                        <div className="col-6">
+                                            <input type="text" readOnly className="form-control-plaintext" defaultValue={this.props.match.params.app_id}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Bug Name</label>
+                                <input type="text" className="form-control" aria-describedby="emailHelp" placeholder="Bug Name" onChange={(e)=>{this.setState({name:e.target.value})}} />
+                            </div>
+                            <div className="form-group">
+                                <label>Bug Description</label>
+                                <textarea className="form-control" rows="3" placeholder="Description about the New Bug" onChange={(e)=>{this.setState({description:e.target.value})}}></textarea>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-4 row">
+                                    <select className="custom-select" onChange={(e)=>{this.setState({status:e.target.value})}} placeholder="Status">
+                                        <option value="" disabled defaultValue selected>Status</option>
+                                        <option value="New">New</option>
+                                        <option value="Resolved">Resolved</option>
+                                        <option value="Re-open">Re-Open</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.addBug} > Report a Bug </button>
+                    </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
   }
@@ -88,86 +142,16 @@ class Bugs extends Component {
 
 const mapStateToProps = (state)=>{
     return {
-        bugs:state.bugs.bugs,
+        user:state.user.user,
+        bugs : state.bugs.bugs,
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        getAllBugs:()=>{dispatch(getAllBugs())},
-        reportBug:(bug)=>{dispatch(insertBug(bug))},
-    }
-}
-class Modal extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            bug:{
-                bugid:null,
-                bugdesc:null,
-                controlname:null,
-                screenname:null,
-                reportedby:null,
-                assignto:null,
-                appid:null,
-                status:null,
-                userid:null,
-                reportdate:null,
-            },
-        }
-    }
-    render(){
-        if(this.props.show){
-            return (
-                <div className="modal fade show" tabIndex="-1" role="dialog" aria-hidden="true" style={{display:'block',paddingRight:17}}>
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" >Report a Bug</h5>
-                            <button type="button" className="close" data-dismiss="modal" onClick={this.props.toggle} aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                        
-                            <input type="text" className="form-control" placeholder="Bug Id" onChange={(e)=>{this.setState({bug:{...this.state.bug,bugid:e.target.value}})}}/>
-                       
-                            <input type="text" className="form-control" placeholder="Bug Description" onChange={(e)=>{this.setState({bug:{...this.state.bug,bugdesc:e.target.value}})}}/>
-                        
-                       
-                            <input type="text" className="form-control" placeholder="Control Name" onChange={(e)=>{this.setState({bug:{...this.state.bug,controlname:e.target.value}})}}/>
-                            
-                       
-                            <input type="text" className="form-control" placeholder="Screen Name" onChange={(e)=>{this.setState({bug:{...this.state.bug,screenname:e.target.value}})}}/>
-                        
-                       
-                            <input type="text" className="form-control" placeholder="Reported By" onChange={(e)=>{this.setState({bug:{...this.state.bug,reportedby:e.target.value}})}}/>
-                        
-                       
-                            <input type="text" className="form-control" placeholder="Assign To" onChange={(e)=>{this.setState({bug:{...this.state.bug,assignto:e.target.value}})}}/>
-                        
-                       
-                            <input type="text" className="form-control" placeholder="Project Id" onChange={(e)=>{this.setState({bug:{...this.state.bug,appid:e.target.value}})}}/>
-                         
-                       
-                            <input type="text" className="form-control" placeholder="Status" onChange={(e)=>{this.setState({bug:{...this.state.bug,status:e.target.value}})}}/>
-                        
-                       
-                            <input type="text" className="form-control" placeholder="Reported Date" onChange={(e)=>{this.setState({bug:{...this.state.bug,reportdate:e.target.value}})}}/>
-                        
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-dismiss="modal"  onClick={this.props.toggle}>Close</button>
-                            <button type="button" className="btn btn-primary" onClick={()=>{this.props.handleSubmit(this.state.bug);this.props.toggle()}}> Add </button>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-            );
-        }
-        else{
-            return null;
-        }
+        addBugs:(bugs)=>{dispatch(addBug(bugs))},
+        getBugs : (param_data)=>{dispatch(getBug(param_data))},
+        clearBugs : ()=>{dispatch(clearBug())},
     }
 }
 

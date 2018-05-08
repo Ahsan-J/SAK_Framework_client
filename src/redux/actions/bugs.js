@@ -1,13 +1,18 @@
-export function setAllBugs(data){
-    return {
-        type:"SET_ALL_BUG",
-        data:data,
-    }
-}
-export function addBug(bug){
+export function addBug(datas){
     return {
         type:"ADD_BUG",
-        data:bug,
+        data:datas,
+    }
+}
+export function getBug(datas){
+    return {
+        type:"GET_BUG",
+        data:datas,
+    }
+}
+export function clearBug(){
+    return{
+        type:"CLEAR_BUG",
     }
 }
 export function setChart(chartData){
