@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import ShortID from 'shortid'
 import _ from 'lodash'
-import {getModule} from '../../redux/axios/module.js'
-import {clearModule} from '../../redux/actions/module.js'
+import {getScreen} from '../../redux/axios/screen.js'
+import {clearScreen} from '../../redux/actions/screen.js'
 
 class Screen extends Component {
   constructor(props){
@@ -43,7 +43,7 @@ class Screen extends Component {
                 <h2>{this.props.match.params.app_id} - Screens</h2>
             </div>
             <div className="btn-group float-right m-4" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#add_module" onClick={this.onOpenModal} >Add a Module Screen</button>
+                <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#add_screen" onClick={this.onOpenModal} >Add a Screen</button>
             </div>
 
             <table className="table table-hover">
@@ -57,7 +57,7 @@ class Screen extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.props.modules.map(function(value,index){
+                    {this.props.screens.map(function(value,index){
                         return (
                             <tr key={value.id + index}>
                                 <td>{value.id}</td>
@@ -70,7 +70,7 @@ class Screen extends Component {
                     })}
                 </tbody>
             </table>
-            <div className="modal fade" id="add_module" tabIndex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div className="modal fade" id="add_screen" tabIndex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
                     <div className="modal-header">
@@ -100,8 +100,8 @@ class Screen extends Component {
                             </div>
                             <div className="form-group">
                                 <label>Module : </label>
-                                <select className="custom-select float-right col-6" onChange={(e)=>{this.setState({module_id:e.target.value})}}>
-                                    {this.props.modules.map(function(item,index){
+                                <select className="custom-select float-right col-6" onChange={(e)=>{this.setState({screen_id:e.target.value})}}>
+                                    {this.props.screens.map(function(item,index){
                                         return (
                                             <option key={item.id + index} value={item.id}> {item.name} </option>
                                         )
@@ -125,14 +125,14 @@ class Screen extends Component {
 const mapStateToProps = (state)=>{
     return {
         user:state.user.user,
-        modules : state.module.modules,
+        screens : state.screen.screen,
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        getModules : (param_data)=>{dispatch(getModule(param_data))},
-        clearModules : ()=>{dispatch(clearModule())},
+        getModules : (param_data)=>{dispatch(getScreen(param_data))},
+        clearModules : ()=>{dispatch(clearScreen())},
     }
 }
 

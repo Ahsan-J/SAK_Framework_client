@@ -44,6 +44,7 @@ class Bugs extends Component {
     this.props.clearBugs();
   }
   render() {
+      console.log()
     return (
         <div>
             <div className="float-left m-4">
@@ -117,13 +118,29 @@ class Bugs extends Component {
                                 <textarea className="form-control" rows="3" placeholder="Description about the New Bug" onChange={(e)=>{this.setState({description:e.target.value})}}></textarea>
                             </div>
                             <div className="form-group">
-                                <div className="col-4 row">
-                                    <select className="custom-select" onChange={(e)=>{this.setState({status:e.target.value})}} placeholder="Status">
-                                        <option value="" disabled defaultValue selected>Status</option>
-                                        <option value="New">New</option>
-                                        <option value="Resolved">Resolved</option>
-                                        <option value="Re-open">Re-Open</option>
-                                    </select>
+                                <div className="row">
+                                    <div className="col-6 row">
+                                        <label className="col-5 col-form-label">Status</label>
+                                        <div className="col-7">    
+                                            <select className="custom-select" onChange={(e)=>{this.setState({status:e.target.value})}} placeholder="Status">
+                                                <option value="New">New</option>
+                                                <option value="Resolved">Resolved</option>
+                                                <option value="Re-open">Re-Open</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-6 row">
+                                        <label className="col-6 col-form-label">Control id:</label>
+                                        <div className="col-6">
+                                            <select class="form-control" id="control_id_selection" onChange={(e)=> this.setState({control_id:e.target.value})}>
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>

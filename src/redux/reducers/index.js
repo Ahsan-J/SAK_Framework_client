@@ -5,6 +5,8 @@ import user from './user.js'
 import test from './test.js'
 import application from './application.js'
 import module from './module.js'
+import control from './control.js'
+import screen from './screen.js'
 
 export default combineReducers({
     reducer,
@@ -13,4 +15,6 @@ export default combineReducers({
     test,
     application,
     module,
+    control,
+    screen,
 });
